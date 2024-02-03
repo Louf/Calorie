@@ -1,0 +1,19 @@
+//
+//  StringLength.swift
+//  CalorieTracker
+//
+//  Created by Louis Farmer on 2/1/24.
+//
+
+import SwiftUI
+
+extension Binding where Value == String {
+    func max(_ limit: Int) -> Self {
+        if self.wrappedValue.count > limit {
+            DispatchQueue.main.async {
+                self.wrappedValue = String(self.wrappedValue.dropLast())
+            }
+        }
+        return self
+    }
+}
