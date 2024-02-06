@@ -37,7 +37,7 @@ struct NewFoodEntryView: View {
                 .background(AnyShapeStyle(.black.gradient), in: .capsule)
                 
                 if selectedFoodItem.name != "" {
-                    FoodCard(foodItem: selectedFoodItem)
+                    FoodCard(foodItem: $selectedFoodItem)
                         .padding(.top)
                     
                     NutritionInput(value: $servings, title: "Servings")

@@ -12,38 +12,33 @@ struct FoodLibraryView: View {
     
     @Environment(\.modelContext) private var context
 
-    @Query(sort: [SortDescriptor(\FoodItem.name, order: .reverse)], animation: .snappy) private var allFoodEntries: [FoodItem]
+    @Query(sort: [SortDescriptor(\FoodItem.name, order: .reverse)], animation: .snappy) private var allFoodItems: [FoodItem]
     
-    var filteredFoodItems: [FoodItem] {
-        guard searchText.isEmpty == false else { return allFoodEntries }
-
-        return allFoodEntries.filter { $0.name.contains(searchText)}
-    }
+    @Query(sort: [SortDescriptor(\FoodEntry.date, order: .reverse)], animation: .snappy) private var allFoodEntries: [FoodEntry]
+    
+    @State private var filteredFoodItems: [FoodItem] = []
     
     @State private var searchText = ""
+    
+    private func filterFoodItems() {
+        if searchText.isEmpty {
+            filteredFoodItems = allFoodItems
+        } else {
+            filteredFoodItems = allFoodItems.filter { $0.name.contains(searchText) }
+        }
+    }
     
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading) {
                 List {
-                    ForEach(filteredFoodItems) { foodItem in
+                    ForEach($filteredFoodItems, id: \.self) { foodItem in
                         FoodCard(foodItem: foodItem)
-                            .swipeActions(edge: .trailing) {
-                                Button(role: .destructive) {
-                                    context.delete(foodItem)
-                                    do {
-                                        try context.save()
-                                    } catch {
-                                        print(error.localizedDescription)
-                                    }
-                                } label: {
-                                    Label("Delete", systemImage: "trash")
-                                }
-                            }
                             .listRowBackground(Color.clear)
                             .listRowInsets(EdgeInsets())
                             .listRowSeparator(.hidden)
                     }
+                    .onDelete(perform: delete)
                 }
                 .padding(.horizontal)
                 .navigationTitle("Food Library")
@@ -52,7 +47,7 @@ struct FoodLibraryView: View {
                 
                 .listRowSpacing(12)
                 .overlay {
-                    if allFoodEntries.isEmpty {
+                    if allFoodItems.isEmpty {
                         ContentUnavailableView("No food items", systemImage: "tray.fill")
                     }
                 }
@@ -64,10 +59,32 @@ struct FoodLibraryView: View {
         .foregroundStyle(.black)
 //        .padding(.horizontal)
         .frame(maxWidth: .infinity, alignment: .leading)
+        .onAppear(perform: filterFoodItems)
+        //On Changes monitors the searchText for filtering as well as the list of foodItems so that it updates when something is deleted
+        .onChange(of: searchText){ filterFoodItems() }
+        .onChange(of: allFoodItems){ filterFoodItems() }
 
     }
     
-    func deleteItem(foodItem: FoodItem){
-        context.delete(foodItem)
+    private func delete(at indexSet: IndexSet) {
+        for index in indexSet {
+            // Delete related FoodEntry objects
+            for foodEntry in allFoodEntries {
+                if foodEntry.foodItem.foodID == allFoodItems[index].foodID {
+                    context.delete(foodEntry)
+                }
+            }
+            
+            // Now delete the FoodItem
+            context.delete(allFoodItems[index])
+        }
+        
+        // Save the context after making changes
+        do {
+            try context.save()
+        } catch {
+            // Handle the error, e.g., show an alert to the user
+            print("Error saving context after deleting food items: \(error)")
+        }
     }
 }

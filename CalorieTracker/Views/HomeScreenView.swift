@@ -11,45 +11,50 @@ import SwiftData
 struct HomeScreenView: View {
     
     @Environment(\.modelContext) private var context
+    @Environment(\.dismiss) var dismiss
     
     @EnvironmentObject var bannerManager: BannerManager
     
     @State private var foodEntryShow = false
     @State private var currentDate = Date() // Add state for tracking current date
     
+    @State private var showingDatePicker = false // New state for managing DatePicker visibility
+    
+    @State private var foodEntriesForCurrentDate: [FoodEntry] = [] // State for filtered entries
+
+    
     // It's just FoodItem for now
     @Query(sort: [SortDescriptor(\FoodEntry.date, order: .reverse)], animation: .snappy) private var allFoodEntries: [FoodEntry]
     
-    // Filter the results based on `currentDate`
-    var foodEntriesForCurrentDate: [FoodEntry] {
-        return allFoodEntries.filter({ Calendar.current.isDate($0.date, inSameDayAs: currentDate) })
+    private func filterFoodEntriesForCurrentDate() {
+        foodEntriesForCurrentDate = allFoodEntries.filter { Calendar.current.isDate($0.date, inSameDayAs: currentDate) }
     }
     
     var totalFat: Int {
         var totalFat = 0
         for entry in foodEntriesForCurrentDate {
-            totalFat += entry.foodItem.fat
+            totalFat += entry.foodItem.fat * entry.quantity
         }
         return totalFat
     }
     var totalCarbs: Int {
         var totalCarbs = 0
         for entry in foodEntriesForCurrentDate {
-            totalCarbs += entry.foodItem.carbs
+            totalCarbs += entry.foodItem.carbs * entry.quantity
         }
         return totalCarbs
     }
     var totalProtein: Int {
         var totalProtein = 0
         for entry in foodEntriesForCurrentDate {
-            totalProtein += entry.foodItem.protein
+            totalProtein += entry.foodItem.protein * entry.quantity
         }
         return totalProtein
     }
     var totalCalories: Int {
         var totalCalories = 0
         for entry in foodEntriesForCurrentDate {
-            totalCalories += entry.foodItem.calories
+            totalCalories += entry.foodItem.calories * entry.quantity
         }
         return totalCalories
     }
@@ -71,8 +76,22 @@ struct HomeScreenView: View {
                     Spacer()
                     
                     // Show current date instead of always today's date
-                    Text(currentDate, style: .date)
-                        .font(.title2.bold())
+                    Button {
+                        showingDatePicker = true
+                    } label: {
+                        Text(currentDate, style: .date)
+                            .font(.title2.bold())
+                    }
+                    .overlay{ //Place the DatePicker in the overlay extension
+                       DatePicker(
+                           "",
+                           selection: $currentDate,
+                           displayedComponents: [.date]
+                       )
+                        .blendMode(.destinationOver) //Use this extension to keep the clickable functionality
+                    }
+
+                    
                     
                     Spacer()
                     
@@ -107,7 +126,7 @@ struct HomeScreenView: View {
                 }
                 
                 ScrollView {
-                    ForEach(foodEntriesForCurrentDate) { foodEntry in
+                    ForEach($foodEntriesForCurrentDate) { foodEntry in
                         FoodCard(foodItem: foodEntry.foodItem)
                     }
                 }
@@ -156,6 +175,15 @@ struct HomeScreenView: View {
         .fullScreenCover(isPresented: $foodEntryShow) {
             NewFoodEntryView()
                 .interactiveDismissDisabled()
+        }
+        .onChange(of: currentDate) {
+            filterFoodEntriesForCurrentDate()
+        }
+        .onChange(of: allFoodEntries) {
+            filterFoodEntriesForCurrentDate()
+        }
+        .onAppear {
+            filterFoodEntriesForCurrentDate()
         }
     }
     

@@ -17,10 +17,14 @@ struct FoodSearchView: View {
 
     @Query(sort: [SortDescriptor(\FoodItem.name, order: .reverse)], animation: .snappy) private var allFoodEntries: [FoodItem]
     
-    var filteredFoodItems: [FoodItem] {
-        guard searchText.isEmpty == false else { return allFoodEntries }
-
-        return allFoodEntries.filter { $0.name.contains(searchText)}
+    @State private var filteredFoodItems: [FoodItem] = []
+    
+    private func filterFoodItems() {
+        if searchText.isEmpty {
+            filteredFoodItems = allFoodEntries
+        } else {
+            filteredFoodItems = allFoodEntries.filter { $0.name.contains(searchText) }
+        }
     }
     
     @State private var searchText = ""
@@ -29,20 +33,8 @@ struct FoodSearchView: View {
         NavigationStack {
             VStack(alignment: .leading) {
                 List {
-                    ForEach(filteredFoodItems) { foodItem in
-                        FoodCard(foodItem: foodItem)
-                            .swipeActions(edge: .trailing) {
-                                Button(role: .destructive) {
-                                    context.delete(foodItem)
-                                    do {
-                                        try context.save()
-                                    } catch {
-                                        print(error.localizedDescription)
-                                    }
-                                } label: {
-                                    Label("Delete", systemImage: "trash")
-                                }
-                            }
+                    ForEach($filteredFoodItems) { $foodItem in
+                        FoodCardNT(foodItem: $foodItem)
                             .listRowBackground(Color.clear)
                             .listRowInsets(EdgeInsets())
                             .listRowSeparator(.hidden)
@@ -71,6 +63,11 @@ struct FoodSearchView: View {
         .foregroundStyle(.black)
 //        .padding(.horizontal)
         .frame(maxWidth: .infinity, alignment: .leading)
+        .onAppear{
+            filterFoodItems()
+        }
+        .onChange(of: searchText, perform: { _ in filterFoodItems() })
+
 
     }
 }

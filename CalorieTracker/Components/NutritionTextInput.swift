@@ -47,9 +47,9 @@ struct NutritionMultiTextInput: View {
                     RoundedRectangle(cornerRadius: 15) // Adjust cornerRadius as needed
                         .stroke(.ultraThinMaterial, lineWidth: 3) // Black outline with a 1 point stroke width
                         .environment(\.colorScheme, .dark)
-
+                        .allowsHitTesting(false)
                 )
-                .scrollContentBackground(.hidden) // <- Hide it
+                
                 .background(.clear) // To see this
         }
     }
