@@ -52,7 +52,7 @@ struct ContentView: View {
                 TabMenu(router: router)
                     .padding(.bottom, 12)
             }
-            .preferredColorScheme(.dark)
+//            .preferredColorScheme(.dark)
         }
     }
 }

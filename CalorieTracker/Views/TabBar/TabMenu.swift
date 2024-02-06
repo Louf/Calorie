@@ -32,7 +32,9 @@ struct TabMenu: View {
             .frame(height: UIScreen.main.bounds.height / 14)
             .frame(maxWidth: UIScreen.main.bounds.width / 1.5)
             .background(
-                RoundedRectangle(cornerRadius: 50, style: .continuous).fill(.ultraThinMaterial)
+                RoundedRectangle(cornerRadius: 50, style: .continuous)
+                    .fill(.ultraThinMaterial)
+                    .environment(\.colorScheme, .dark)
             )
             
             if showMenu {

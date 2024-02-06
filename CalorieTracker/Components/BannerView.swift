@@ -14,14 +14,15 @@ struct BannerView: View {
         HStack {
             Image(systemName: image)
                 .font(.headline)
-                .padding()
+            Spacer()
             Text(message)
                 .font(.subheadline)
         }
-        .frame(maxWidth: .infinity)
+        .frame(maxWidth: UIScreen.main.bounds.width * 0.7)
+        .padding()
         .background(.ultraThinMaterial)
+        .environment(\.colorScheme, .dark)
         .foregroundColor(.white)
         .cornerRadius(10)
-        .padding()
     }
 }

@@ -1,16 +1,19 @@
 //
-//  FoodLibraryView.swift
+//  FoodSearchView.swift
 //  CalorieTracker
 //
-//  Created by Louis Farmer on 1/30/24.
+//  Created by Louis Farmer on 2/5/24.
 //
 
 import SwiftUI
 import SwiftData
 
-struct FoodLibraryView: View {
+struct FoodSearchView: View {
     
     @Environment(\.modelContext) private var context
+    @Environment(\.dismiss) var dismiss
+    
+    @Binding var selectedFoodItem: FoodItem
 
     @Query(sort: [SortDescriptor(\FoodItem.name, order: .reverse)], animation: .snappy) private var allFoodEntries: [FoodItem]
     
@@ -43,11 +46,15 @@ struct FoodLibraryView: View {
                             .listRowBackground(Color.clear)
                             .listRowInsets(EdgeInsets())
                             .listRowSeparator(.hidden)
+                            .onTapGesture {
+                                selectedFoodItem = foodItem
+                                dismiss()
+                            }
                     }
                 }
                 .padding(.horizontal)
                 .navigationTitle("Food Library")
-                .searchable(text: $searchText, placement: .navigationBarDrawer)
+                .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always))
                 .listStyle(PlainListStyle())
                 
                 .listRowSpacing(12)
@@ -65,9 +72,5 @@ struct FoodLibraryView: View {
 //        .padding(.horizontal)
         .frame(maxWidth: .infinity, alignment: .leading)
 
-    }
-    
-    func deleteItem(foodItem: FoodItem){
-        context.delete(foodItem)
     }
 }

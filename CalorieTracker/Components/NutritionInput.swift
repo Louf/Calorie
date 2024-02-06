@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Combine
 
 struct NutritionInput: View {
     
@@ -28,7 +29,14 @@ struct NutritionInput: View {
                                 endPoint: .trailing)
                         )
                 }
-            
+                //Sanitizes the input so that only numbers can be entered in, even if the user tries to paste in non-numerics
+                .onReceive(Just(value)) { newValue in
+                    let filtered = newValue.filter { "0123456789".contains($0) }
+                    if filtered != newValue {
+                        self.value = filtered
+                    }
+                }
+            Spacer()
             Text(title)
                 .font(.system(size: 32, weight: .bold))
                 .padding(.bottom, 10)

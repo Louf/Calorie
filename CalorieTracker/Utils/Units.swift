@@ -7,11 +7,13 @@
 
 import Foundation
 
-enum Unit: String, CaseIterable {
-    case gram = "g"
-    case kilogram = "kg"
-    case ounce = "oz"
-    case pound = "lb"
+enum FoodUnit: String, CaseIterable, Identifiable {
+    case grams = "g"
+    case pounds = "lbs"
+    case cups = "cups"
+    case tablespoons = "tbsp"
+    case teaspoons = "tsp"
+    case ounces = "oz"
     
-    // Add more units as needed
+    var id: String { self.rawValue }
 }

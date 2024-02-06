@@ -31,6 +31,7 @@ struct PopUpMenu: View {
         .background(
             RoundedRectangle(cornerRadius: 50, style: .continuous)
                 .fill(.ultraThinMaterial)
+                .environment(\.colorScheme, .dark)
                 .frame(maxWidth: UIScreen.main.bounds.width / 1.5)
                 .frame(height: 120)
                 
