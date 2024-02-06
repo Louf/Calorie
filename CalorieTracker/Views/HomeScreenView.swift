@@ -15,61 +15,153 @@ struct HomeScreenView: View {
     @EnvironmentObject var bannerManager: BannerManager
     
     @State private var foodEntryShow = false
+    @State private var currentDate = Date() // Add state for tracking current date
     
-    //ITS JUST FOODITEM FOR NOW
+    // It's just FoodItem for now
     @Query(sort: [SortDescriptor(\FoodEntry.date, order: .reverse)], animation: .snappy) private var allFoodEntries: [FoodEntry]
     
-    //Filter the results here
-    //Do not try to filter inside the query, much harder, though would be cleaner if I could get it to work
-    var foodEntriesToday: [FoodEntry] {
-        return allFoodEntries.filter({ Calendar.current.isDateInToday($0.date) })
+    // Filter the results based on `currentDate`
+    var foodEntriesForCurrentDate: [FoodEntry] {
+        return allFoodEntries.filter({ Calendar.current.isDate($0.date, inSameDayAs: currentDate) })
     }
     
-//    init() {
-//        UINavigationBar.appearance().titleTextAttributes = [.font : UIFont(name: "Georgia-Bold", size: 24)!]
-//    }
+    var totalFat: Int {
+        var totalFat = 0
+        for entry in foodEntriesForCurrentDate {
+            totalFat += entry.foodItem.fat
+        }
+        return totalFat
+    }
+    var totalCarbs: Int {
+        var totalCarbs = 0
+        for entry in foodEntriesForCurrentDate {
+            totalCarbs += entry.foodItem.carbs
+        }
+        return totalCarbs
+    }
+    var totalProtein: Int {
+        var totalProtein = 0
+        for entry in foodEntriesForCurrentDate {
+            totalProtein += entry.foodItem.protein
+        }
+        return totalProtein
+    }
+    var totalCalories: Int {
+        var totalCalories = 0
+        for entry in foodEntriesForCurrentDate {
+            totalCalories += entry.foodItem.calories
+        }
+        return totalCalories
+    }
     
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading) {
-                    HStack {
-                        Text(Date(), style: .date)
-                            .font(.title2.bold())
-                        Spacer()
-                        Button {
-                            foodEntryShow.toggle()
-                        } label: {
-                            ZStack {
-                                Circle()
-                                    .foregroundColor(.white)
-                                    .frame(width: 48, height: 48)
-                                    .shadow(radius: 4)
-                                
-                                Image(systemName: "plus.circle.fill")
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fit)
-                                    .frame(width: 45, height: 45)
-                                    .foregroundColor(Color(.black))
-                            }
-                        }
+            VStack(alignment: .leading) {
+                HStack {
+                    // Left arrow for previous day
+                    Button {
+                        moveDay(by: -1)
+                    } label: {
+                        Image(systemName: "arrow.left.circle.fill")
+                            .resizable()
+                            .frame(width: 32, height: 32)
+                            .foregroundColor(.black)
                     }
                     
-                    ForEach(foodEntriesToday) { foodEntry in
-                        Text(foodEntry.foodItem.name)
+                    Spacer()
+                    
+                    // Show current date instead of always today's date
+                    Text(currentDate, style: .date)
+                        .font(.title2.bold())
+                    
+                    Spacer()
+                    
+                    // Right arrow for next day
+                    Button {
+                        moveDay(by: 1)
+                    } label: {
+                        Image(systemName: "arrow.right.circle.fill")
+                            .resizable()
+                            .frame(width: 32, height: 32)
+                            .foregroundColor(.black)
+                    }
+                    
+                    Spacer()
+                    
+                    Button {
+                        foodEntryShow.toggle()
+                    } label: {
+                        ZStack {
+                            Circle()
+                                .foregroundColor(.white)
+                                .frame(width: 48, height: 48)
+                                .shadow(radius: 4)
+                            
+                            Image(systemName: "plus.circle.fill")
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 45, height: 45)
+                                .foregroundColor(Color(.black))
+                        }
                     }
                 }
-                .padding()
+                
+                ScrollView {
+                    ForEach(foodEntriesForCurrentDate) { foodEntry in
+                        FoodCard(foodItem: foodEntry.foodItem)
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .frame(height: 355)
+                
+                if !foodEntriesForCurrentDate.isEmpty {
+                    HStack {
+                        VStack(alignment: .leading) {
+                            Text("\(totalProtein)g")
+                                .font(.system(size: 26, weight: .bold))
+                            Text("Protein")
+                        }
+                        Spacer()
+                        VStack(alignment: .center) {
+                            Text("\(totalFat)g")
+                                .font(.system(size: 26, weight: .bold))
+                            Text("Fat")
+                        }
+                        Spacer()
+                        VStack(alignment: .trailing) {
+                            Text("\(totalCarbs)g")
+                                .font(.system(size: 26, weight: .bold))
+                            Text("Carbs")
+                        }
+                    }
+                    .font(.subheadline)
+                    
+                    VStack(alignment: .trailing) {
+                        Text("\(totalCalories)")
+                            .font(.system(size: 32, weight: .bold))
+                        Text("Cal")
+                    }
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+                }
+                
+                Spacer()
+                
             }
+            .padding()
             .navigationBarTitle("Welcome back", displayMode: .large)
             .navigationBarTitleDisplayMode(.inline)
             .foregroundStyle(.black)
-//            .padding()
             .frame(maxWidth: .infinity, alignment: .leading)
         }
         .fullScreenCover(isPresented: $foodEntryShow) {
             NewFoodEntryView()
                 .interactiveDismissDisabled()
         }
+    }
+    
+    // Function to move the day by a given amount
+    private func moveDay(by dayOffset: Int) {
+        guard let newDate = Calendar.current.date(byAdding: .day, value: dayOffset, to: currentDate) else { return }
+        currentDate = newDate
     }
 }
