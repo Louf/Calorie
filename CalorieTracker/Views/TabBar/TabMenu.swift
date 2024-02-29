@@ -1,10 +1,3 @@
-//
-//  TabMenu.swift
-//  CalorieTracker
-//
-//  Created by Louis Farmer on 1/31/24.
-//
-
 import SwiftUI
 
 struct TabMenu: View {

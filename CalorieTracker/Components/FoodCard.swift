@@ -1,10 +1,3 @@
-//
-//  FoodCard.swift
-//  CalorieTracker
-//
-//  Created by Louis Farmer on 2/4/24.
-//
-
 import SwiftUI
 
 struct FoodCard: View {

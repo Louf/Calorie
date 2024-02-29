@@ -1,10 +1,3 @@
-//
-//  NewFoodEntryView.swift
-//  CalorieTracker
-//
-//  Created by Louis Farmer on 2/5/24.
-//
-
 import SwiftUI
 
 struct NewFoodEntryView: View {

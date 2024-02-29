@@ -1,10 +1,3 @@
-//
-//  BannerManager.swift
-//  CalorieTracker
-//
-//  Created by Louis Farmer on 2/2/24.
-//
-
 import SwiftUI
 
 class BannerManager: ObservableObject {

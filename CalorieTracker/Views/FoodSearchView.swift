@@ -1,10 +1,3 @@
-//
-//  FoodSearchView.swift
-//  CalorieTracker
-//
-//  Created by Louis Farmer on 2/5/24.
-//
-
 import SwiftUI
 import SwiftData
 

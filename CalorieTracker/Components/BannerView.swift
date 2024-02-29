@@ -1,10 +1,3 @@
-//
-//  BannerView.swift
-//  CalorieTracker
-//
-//  Created by Louis Farmer on 2/2/24.
-//
-
 import SwiftUI
 
 struct BannerView: View {

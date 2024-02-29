@@ -1,10 +1,3 @@
-//
-//  StringLength.swift
-//  CalorieTracker
-//
-//  Created by Louis Farmer on 2/1/24.
-//
-
 import SwiftUI
 
 extension Binding where Value == String {

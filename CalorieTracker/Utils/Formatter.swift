@@ -1,10 +1,3 @@
-//
-//  Formatter.swift
-//  CalorieTracker
-//
-//  Created by Louis Farmer on 2/6/24.
-//
-
 import Foundation
 
 var formatterInput: NumberFormatter {

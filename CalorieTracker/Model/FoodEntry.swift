@@ -1,10 +1,3 @@
-//
-//  FoodEntry.swift
-//  CalorieTracker
-//
-//  Created by Louis Farmer on 1/30/24.
-//
-
 import SwiftData
 import SwiftUI
 
